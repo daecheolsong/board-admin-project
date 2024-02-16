@@ -20,6 +20,7 @@ public class SecurityConfig {
                     authRequest.anyRequest().permitAll();
                 })
                 .formLogin(Customizer.withDefaults())
+                .oauth2Login(Customizer.withDefaults())
                 .logout(logout -> logout.logoutSuccessUrl("/"))
                 .build();
     }
