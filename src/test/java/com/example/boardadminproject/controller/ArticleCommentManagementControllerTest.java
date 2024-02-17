@@ -1,18 +1,31 @@
 package com.example.boardadminproject.controller;
 
 import com.example.boardadminproject.config.SecurityConfig;
+import com.example.boardadminproject.domain.constant.RoleType;
+import com.example.boardadminproject.dto.ArticleDto;
+import com.example.boardadminproject.dto.UserAccountDto;
+import com.example.boardadminproject.service.ArticleManagementService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+
+import static org.mockito.BDDMockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@DisplayName("View 컨트롤러 - 댓글 관리")
+@DisplayName("컨트롤러 - 댓글 관리")
 @Import(SecurityConfig.class)
 @WebMvcTest
 class ArticleCommentManagementControllerTest {
@@ -20,15 +33,81 @@ class ArticleCommentManagementControllerTest {
     @Autowired
     private MockMvc mvc;
 
+    @MockBean
+    private ArticleManagementService articleManagementService;
+
     @Test
     @DisplayName("[view][GET] 댓글 관리 페이지 - 정상 호출")
     public void given_whenRequestingArticleCommentManagementView_thenReturnsArticleCommentManagementView() throws Exception {
 
+        given(articleManagementService.getArticles()).willReturn(List.of());
+
         mvc.perform(get("/management/article-comments"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-                .andExpect(view().name("management/article-comments"));
+                .andExpect(view().name("management/article-comments"))
+                .andExpect(model().attribute("articles", List.of()));
+        then(articleManagementService).should().getArticles();
 
+    }
+
+    @DisplayName("[data][GET] 게시글 1개 - 정상 호출")
+    @Test
+    void givenArticleId_whenRequestingArticle_thenReturnsArticle() throws Exception {
+
+        Long articleId = 1L;
+        ArticleDto articleDto = createArticleDto("title", "content");
+        given(articleManagementService.getArticle(articleId)).willReturn(articleDto);
+
+        mvc.perform(get("/management/articles/" + articleId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(articleId))
+                .andExpect(jsonPath("$.title").value(articleDto.title()))
+                .andExpect(jsonPath("$.content").value(articleDto.content()))
+                .andExpect(jsonPath("$.userAccount.nickname").value(articleDto.userAccount().nickname()));
+        then(articleManagementService).should().getArticle(articleId);
+    }
+
+    @DisplayName("[view][POST] 게시글 삭제 - 정상 호출")
+    @Test
+    void givenArticleId_whenRequestingDeletion_thenRedirectsToArticleManagementView() throws Exception {
+
+        Long articleId = 1L;
+        willDoNothing().given(articleManagementService).deleteArticle(articleId);
+
+        mvc.perform(post("/management/articles/" + articleId)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/management/articles"))
+                .andExpect(redirectedUrl("/management/articles"));
+        then(articleManagementService).should().deleteArticle(articleId);
+    }
+
+
+    private ArticleDto createArticleDto(String title, String content) {
+        return ArticleDto.of(
+                1L,
+                createUserAccountDto(),
+                title,
+                content,
+                null,
+                LocalDateTime.now(),
+                "Song",
+                LocalDateTime.now(),
+                "Song"
+        );
+    }
+
+    private UserAccountDto createUserAccountDto() {
+        return UserAccountDto.of(
+                "tester",
+                "pw",
+                Set.of(RoleType.ADMIN),
+                "tester@email.com",
+                "tester",
+                "test memo"
+        );
     }
 
 }
