@@ -11,5 +11,7 @@ public interface AdminAccountRepository extends JpaRepository<AdminAccount, Long
 
     AdminAccount findByUserId(String userId);
 
+    void deleteByUserId(String userId);
+
 }
 
