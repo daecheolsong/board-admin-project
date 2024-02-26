@@ -18,7 +18,7 @@ import static org.mockito.BDDMockito.*;
  * @author daecheol song
  * @since 1.0
  */
-@Import(TestSecurityConfig.class)
+@Import(SecurityConfig.class)
 @TestConfiguration
 public class TestSecurityConfig {
 
