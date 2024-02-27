@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DisplayName("컨트롤러 - 댓글 관리")
 @Import(TestSecurityConfig.class)
-@WebMvcTest
+@WebMvcTest(ArticleCommentManagementController.class)
 class ArticleCommentManagementControllerTest {
 
     @Autowired
@@ -33,6 +34,7 @@ class ArticleCommentManagementControllerTest {
     @MockBean
     private ArticleCommentManagementService articleCommentManagementService;
 
+    @WithMockUser(username = "tester", roles = "USER")
     @Test
     @DisplayName("[view][GET] 댓글 관리 페이지 - 정상 호출")
     public void given_whenRequestingArticleCommentManagementView_thenReturnsArticleCommentManagementView() throws Exception {
@@ -43,14 +45,13 @@ class ArticleCommentManagementControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("management/article-comments"))
-                .andExpect(model().attribute("articles", List.of()))
-                .andExpect(view().name("management/article-comments"))
                 .andExpect(model().attribute("comments", List.of()));
         then(articleCommentManagementService).should().getArticleComments();
 
     }
 
 
+    @WithMockUser(username = "tester", roles = "USER")
     @DisplayName("[data][GET] 댓글 1개 - 정상 호출")
     @Test
     void givenCommentId_whenRequestingArticleComment_thenReturnsArticleComment() throws Exception {
@@ -68,6 +69,7 @@ class ArticleCommentManagementControllerTest {
         then(articleCommentManagementService).should().getArticleComment(articleCommentId);
     }
 
+    @WithMockUser(username = "tester", roles = "MANAGER")
     @DisplayName("[view][POST] 댓글 삭제 - 정상 호출")
     @Test
     void givenCommentId_whenRequestingDeletion_thenRedirectsToArticleCommentManagementView() throws Exception {
