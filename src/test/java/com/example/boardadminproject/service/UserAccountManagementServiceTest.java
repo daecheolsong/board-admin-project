@@ -94,19 +94,19 @@ class UserAccountManagementServiceTest {
         void givenUserAccountId_whenCallingUserAccountApi_thenReturnsUserAccount() throws Exception {
 
             String userId = "song";
-            UserAccountDto expectedUserAccount = createUserAccountDto(userId, "Song");
+            UserAccountClientResponse expectedResponse = createUserClientResponseWithUserId(userId);
             server
-                    .expect(requestTo(projectProperties.board().url() + "/api/userAccounts/" + userId))
+                    .expect(requestTo(projectProperties.board().url() + "/api/userAccounts?userId=" + userId))
                     .andRespond(withSuccess(
-                            mapper.writeValueAsString(expectedUserAccount),
+                            mapper.writeValueAsString(expectedResponse),
                             MediaType.APPLICATION_JSON
                     ));
 
             UserAccountDto result = sut.getUserAccount(userId);
 
             assertThat(result)
-                    .hasFieldOrPropertyWithValue("userId", expectedUserAccount.userId())
-                    .hasFieldOrPropertyWithValue("nickname", expectedUserAccount.nickname());
+                    .hasFieldOrPropertyWithValue("userId", expectedResponse.userAccounts().get(0).userId())
+                    .hasFieldOrPropertyWithValue("nickname", expectedResponse.userAccounts().get(0).nickname());
             server.verify();
         }
 
@@ -132,6 +132,11 @@ class UserAccountManagementServiceTest {
                 nickname,
                 "test memo"
         );
+    }
+
+    private UserAccountClientResponse createUserClientResponseWithUserId(String userId) {
+        return UserAccountClientResponse
+                .of(List.of(createUserAccountDto(userId, userId)));
     }
 
 }
