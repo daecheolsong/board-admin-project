@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DisplayName("컨트롤러 - 게시글 관리")
 @Import(TestSecurityConfig.class)
-@WebMvcTest
+@WebMvcTest(ArticleManagementController.class)
 class ArticleManagementControllerTest {
 
     @Autowired

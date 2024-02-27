@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DisplayName("View 컨트롤러 - 루트")
 @Import(TestSecurityConfig.class)
-@WebMvcTest
+@WebMvcTest(MainController.class)
 class MainControllerTest {
 
     @Autowired

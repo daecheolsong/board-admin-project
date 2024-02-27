@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DisplayName("컨트롤러 - 회원 관리")
 @Import(TestSecurityConfig.class)
-@WebMvcTest
+@WebMvcTest(UserAccountManagementController.class)
 class UserAccountManagementControllerTest {
 
     @Autowired
