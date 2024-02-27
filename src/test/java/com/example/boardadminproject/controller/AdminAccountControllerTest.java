@@ -1,6 +1,6 @@
 package com.example.boardadminproject.controller;
 
-import com.example.boardadminproject.config.SecurityConfig;
+import com.example.boardadminproject.config.TestSecurityConfig;
 import com.example.boardadminproject.service.AdminAccountService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,22 +9,22 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("View 컨트롤러 - 어드민 회원")
-@Import(SecurityConfig.class)
+@Import(TestSecurityConfig.class)
 @WebMvcTest(AdminAccountController.class)
 class AdminAccountControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
-    @MockBean
-    private AdminAccountService adminAccountService;
 
+    @WithMockUser(username = "tester", roles = "USER")
     @Test
     @DisplayName("[view][GET] 어드민 회원 페이지 - 정상 호출")
     public void given_whenRequestingAdminUserAccountView_thenReturnsAdminUserAccountView () throws Exception {
