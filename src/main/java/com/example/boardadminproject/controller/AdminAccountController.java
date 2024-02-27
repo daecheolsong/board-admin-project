@@ -1,6 +1,8 @@
 package com.example.boardadminproject.controller;
 
 import com.example.boardadminproject.dto.response.AdminAccountResponse;
+import com.example.boardadminproject.service.AdminAccountService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -15,12 +17,14 @@ import java.util.List;
  * @author daecheol song
  * @since 1.0
  */
-@RequestMapping("/admin/members")
+@RequiredArgsConstructor
 @Controller
 public class AdminAccountController {
 
-    @GetMapping
-    public String members(Model model) {
+    private final AdminAccountService adminAccountService;
+
+    @GetMapping("/admin/members")
+    public String members() {
 
         return "admin/members";
     }
@@ -28,7 +32,10 @@ public class AdminAccountController {
     @ResponseBody
     @GetMapping("/api/admin/members")
     public List<AdminAccountResponse> getMembers() {
-        return List.of();
+
+        return adminAccountService.users().stream()
+                .map(AdminAccountResponse::from)
+                .toList();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -36,6 +43,7 @@ public class AdminAccountController {
     @DeleteMapping("/api/admin/members/{userId}")
     public void delete(@PathVariable String userId) {
 
+        adminAccountService.deleteUser(userId);
     }
 }
 
