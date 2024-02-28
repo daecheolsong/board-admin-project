@@ -1,5 +1,6 @@
 package com.example.boardadminproject.controller;
 
+import com.example.boardadminproject.config.TestGlobalControllerConfig;
 import com.example.boardadminproject.config.TestSecurityConfig;
 import com.example.boardadminproject.service.AdminAccountService;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("View 컨트롤러 - 어드민 회원")
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, TestGlobalControllerConfig.class})
 @WebMvcTest(AdminAccountController.class)
 class AdminAccountControllerTest {
 
